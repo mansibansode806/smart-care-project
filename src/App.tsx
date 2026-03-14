@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import LandingPage from "./pages/LandingPage";
+import QueuePage from "./pages/QueuePage";
 import PatientDashboard from "./pages/PatientDashboard";
 import EmergencyPage from "./pages/EmergencyPage";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/patient" element={<PatientDashboard />} />
           <Route path="/emergency" element={<EmergencyPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/queue" element={<QueuePage />} />
           <Route path="/ai-prediction" element={<AIPrediction />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

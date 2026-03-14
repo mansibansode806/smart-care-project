@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Search, Bed, Calendar, AlertTriangle, Brain, Hospital, Users, Stethoscope, Phone, Mail, MapPin } from "lucide-react";
+import { Heart, Search, Bed, Calendar, AlertTriangle, Brain, Hospital, Users, Stethoscope, Phone, Mail, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
@@ -9,6 +9,7 @@ const features = [
   { icon: Bed, title: "ICU & Bed Availability", desc: "Real-time bed and ICU status across hospitals" },
   { icon: Calendar, title: "Online Appointments", desc: "Book appointments with doctors instantly" },
   { icon: AlertTriangle, title: "Emergency Finder", desc: "Locate nearest hospitals with ICU availability" },
+  { icon: Clock, title: "Live Queue Tracking", desc: "Check patient wait times and get turn reminders" },
   { icon: Brain, title: "AI Bed Prediction", desc: "Forecast bed demand using AI analytics" },
   { icon: Heart, title: "Health Assistant", desc: "AI chatbot for health guidance and navigation" },
 ];
@@ -32,6 +33,7 @@ const LandingPage = () => {
           </Link>
           <div className="hidden items-center gap-6 md:flex">
             <Link to="/emergency" className="text-sm font-medium text-muted-foreground hover:text-foreground">Emergency</Link>
+            <Link to="/queue" className="text-sm font-medium text-muted-foreground hover:text-foreground">Queue</Link>
             <Link to="/patient" className="text-sm font-medium text-muted-foreground hover:text-foreground">Patient Portal</Link>
             <Link to="/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground">Admin</Link>
             <Link to="/ai-prediction" className="text-sm font-medium text-muted-foreground hover:text-foreground">AI Predictions</Link>
