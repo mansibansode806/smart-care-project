@@ -9,6 +9,7 @@ const features = [
   { icon: Bed, title: "ICU & Bed Availability", desc: "Real-time bed and ICU status across hospitals" },
   { icon: Calendar, title: "Online Appointments", desc: "Book appointments with doctors instantly" },
   { icon: AlertTriangle, title: "Emergency Finder", desc: "Locate nearest hospitals with ICU availability" },
+  { icon: Clock, title: "Live Queue Tracking", desc: "Check patient wait times and get turn reminders" },
   { icon: Brain, title: "AI Bed Prediction", desc: "Forecast bed demand using AI analytics" },
   { icon: Heart, title: "Health Assistant", desc: "AI chatbot for health guidance and navigation" },
 ];
