@@ -32,6 +32,7 @@ const LandingPage = () => {
           </Link>
           <div className="hidden items-center gap-6 md:flex">
             <Link to="/emergency" className="text-sm font-medium text-muted-foreground hover:text-foreground">Emergency</Link>
+            <Link to="/queue" className="text-sm font-medium text-muted-foreground hover:text-foreground">Queue</Link>
             <Link to="/patient" className="text-sm font-medium text-muted-foreground hover:text-foreground">Patient Portal</Link>
             <Link to="/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground">Admin</Link>
             <Link to="/ai-prediction" className="text-sm font-medium text-muted-foreground hover:text-foreground">AI Predictions</Link>
