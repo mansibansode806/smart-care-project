@@ -191,9 +191,13 @@ const LandingPage = () => {
         </div>
       </footer>
 
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} onSwitchToSignup={() => setSignupOpen(true)} onLoginSuccess={handleLoginSuccess} />
+      <SignupModal open={signupOpen} onOpenChange={setSignupOpen} onSwitchToLogin={() => setLoginOpen(true)} />
       <ChatbotWidget />
     </div>
   );
 };
+
+export default LandingPage;
 
 export default LandingPage;
