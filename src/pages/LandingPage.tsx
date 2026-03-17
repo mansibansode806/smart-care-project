@@ -25,6 +25,26 @@ const stats = [
 ];
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const session = localStorage.getItem("smartcare_session");
+    if (session) setUser(JSON.parse(session));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("smartcare_session");
+    setUser(null);
+  };
+
+  const handleLoginSuccess = (u: { name: string; email: string }) => {
+    setUser(u);
+    navigate("/patient");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
@@ -42,12 +62,21 @@ const LandingPage = () => {
             <Link to="/ai-prediction" className="text-sm font-medium text-muted-foreground hover:text-foreground">AI Predictions</Link>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/patient">Login</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link to="/patient">Sign Up</Link>
-            </Button>
+            {user ? (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/patient">Dashboard</Link>
+                </Button>
+                <Button size="sm" variant="ghost" onClick={handleLogout} className="gap-1.5">
+                  <LogOut className="h-4 w-4" /> Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)}>Login</Button>
+                <Button size="sm" onClick={() => setSignupOpen(true)}>Sign Up</Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
