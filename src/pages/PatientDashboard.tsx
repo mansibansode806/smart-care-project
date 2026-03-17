@@ -177,32 +177,54 @@ const PatientDashboard = () => {
                 <form onSubmit={(e) => { e.preventDefault(); setBooked(true); }} className="space-y-4">
                   <div><Label>Patient Name</Label><Input placeholder="Your full name" required /></div>
                   <div>
-                    <Label>Doctor</Label>
-                    <Select required>
-                      <SelectTrigger><SelectValue placeholder="Select doctor" /></SelectTrigger>
-                      <SelectContent>{doctors.map((d) => <SelectItem key={d.id} value={String(d.id)}>{d.name} – {d.specialization}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
                     <Label>Hospital</Label>
-                    <Select required>
+                    <Select value={selectedHospital} onValueChange={handleHospitalChange} required>
                       <SelectTrigger><SelectValue placeholder="Select hospital" /></SelectTrigger>
                       <SelectContent>{hospitals.map((h) => <SelectItem key={h.name} value={h.name}>{h.name}</SelectItem>)}</SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label>Doctor</Label>
+                    {loadingDoctors ? (
+                      <div className="flex items-center gap-2 rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Loading doctors...
+                      </div>
+                    ) : (
+                      <Select value={selectedDoctor} onValueChange={handleDoctorChange} disabled={!selectedHospital} required>
+                        <SelectTrigger><SelectValue placeholder={selectedHospital ? "Select doctor" : "Select a hospital first"} /></SelectTrigger>
+                        <SelectContent>
+                          {filteredDoctorsByHospital.length === 0 ? (
+                            <div className="px-3 py-2 text-sm text-muted-foreground">No doctors available for this hospital</div>
+                          ) : (
+                            filteredDoctorsByHospital.map((d) => <SelectItem key={d.id} value={String(d.id)}>{d.name} – {d.specialization}</SelectItem>)
+                          )}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><Label>Date</Label><Input type="date" required /></div>
                     <div>
                       <Label>Time Slot</Label>
-                      <Select required>
-                        <SelectTrigger><SelectValue placeholder="Select time" /></SelectTrigger>
-                        <SelectContent>
-                          {["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"].map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      {loadingSlots ? (
+                        <div className="flex items-center gap-2 rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" /> Loading slots...
+                        </div>
+                      ) : (
+                        <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot} disabled={!selectedDoctor} required>
+                          <SelectTrigger><SelectValue placeholder={selectedDoctor ? "Select time" : "Select a doctor first"} /></SelectTrigger>
+                          <SelectContent>
+                            {availableTimeSlots.length === 0 ? (
+                              <div className="px-3 py-2 text-sm text-muted-foreground">No slots available</div>
+                            ) : (
+                              availableTimeSlots.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">Confirm Appointment</Button>
+                  <Button type="submit" className="w-full" disabled={!selectedHospital || !selectedDoctor || !selectedTimeSlot}>Confirm Appointment</Button>
                 </form>
               )}
             </CardContent>
