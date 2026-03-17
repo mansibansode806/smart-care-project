@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
-import { Heart, Search, Bed, Calendar, AlertTriangle, Brain, Hospital, Users, Stethoscope, Phone, Mail, MapPin, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Heart, Search, Bed, Calendar, AlertTriangle, Brain, Hospital, Users, Stethoscope, Phone, Mail, MapPin, Clock, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
+import { LoginModal } from "@/components/LoginModal";
+import { SignupModal } from "@/components/SignupModal";
 
 const features = [
   { icon: Search, title: "Doctor Search", desc: "Find doctors by specialization and availability" },
