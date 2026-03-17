@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Heart, Search, Calendar, Bed, Stethoscope, Clock, MapPin, CheckCircle, ArrowLeft } from "lucide-react";
+import { Heart, Search, Calendar, Bed, Stethoscope, Clock, MapPin, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,12 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChatbotWidget } from "@/components/ChatbotWidget";
 
 const doctors = [
-  { id: 1, name: "Dr. Sarah Chen", specialization: "Cardiologist", qualification: "MD, FACC", experience: "15 years", hospital: "City Heart Hospital", available: "Mon-Fri, 9AM-5PM" },
-  { id: 2, name: "Dr. James Wilson", specialization: "Neurologist", qualification: "MD, PhD", experience: "12 years", hospital: "Metro General Hospital", available: "Mon-Sat, 10AM-4PM" },
-  { id: 3, name: "Dr. Priya Sharma", specialization: "Orthopedic", qualification: "MS Ortho", experience: "10 years", hospital: "National Medical Center", available: "Tue-Sat, 8AM-2PM" },
-  { id: 4, name: "Dr. Michael Brown", specialization: "Pediatrician", qualification: "MD Pediatrics", experience: "8 years", hospital: "Children's Care Hospital", available: "Mon-Fri, 11AM-6PM" },
-  { id: 5, name: "Dr. Anita Patel", specialization: "Dermatologist", qualification: "MD Dermatology", experience: "9 years", hospital: "Skin & Care Clinic", available: "Mon-Thu, 9AM-3PM" },
-  { id: 6, name: "Dr. Robert Lee", specialization: "Cardiologist", qualification: "MD, DM Cardio", experience: "20 years", hospital: "Apollo Heart Center", available: "Mon-Sat, 8AM-1PM" },
+  { id: 1, name: "Dr. Sarah Chen", specialization: "Cardiologist", qualification: "MD, FACC", experience: "15 years", hospital: "City Heart Hospital", available: "Mon-Fri, 9AM-5PM", timeSlots: ["9:00 AM", "11:00 AM", "2:00 PM", "4:00 PM"] },
+  { id: 2, name: "Dr. James Wilson", specialization: "Neurologist", qualification: "MD, PhD", experience: "12 years", hospital: "City Heart Hospital", available: "Mon-Sat, 10AM-4PM", timeSlots: ["10:00 AM", "12:00 PM", "3:00 PM"] },
+  { id: 3, name: "Dr. Priya Sharma", specialization: "Orthopedic", qualification: "MS Ortho", experience: "10 years", hospital: "National Medical Center", available: "Tue-Sat, 8AM-2PM", timeSlots: ["8:00 AM", "10:00 AM", "1:00 PM"] },
+  { id: 4, name: "Dr. Michael Brown", specialization: "Pediatrician", qualification: "MD Pediatrics", experience: "8 years", hospital: "Children's Care Hospital", available: "Mon-Fri, 11AM-6PM", timeSlots: ["11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM"] },
+  { id: 5, name: "Dr. Anita Patel", specialization: "Dermatologist", qualification: "MD Dermatology", experience: "9 years", hospital: "Metro General Hospital", available: "Mon-Thu, 9AM-3PM", timeSlots: ["9:00 AM", "11:00 AM", "2:00 PM"] },
+  { id: 6, name: "Dr. Robert Lee", specialization: "Cardiologist", qualification: "MD, DM Cardio", experience: "20 years", hospital: "Apollo Heart Center", available: "Mon-Sat, 8AM-1PM", timeSlots: ["8:00 AM", "9:30 AM", "11:00 AM", "12:30 PM"] },
+  { id: 7, name: "Dr. Emily Davis", specialization: "Neurologist", qualification: "MD Neurology", experience: "7 years", hospital: "Metro General Hospital", available: "Mon-Fri, 10AM-5PM", timeSlots: ["10:00 AM", "1:00 PM", "4:00 PM"] },
+  { id: 8, name: "Dr. Raj Kapoor", specialization: "General Physician", qualification: "MBBS, MD", experience: "14 years", hospital: "National Medical Center", available: "Mon-Sat, 9AM-6PM", timeSlots: ["9:00 AM", "11:30 AM", "2:00 PM", "4:30 PM"] },
 ];
 
 const hospitals = [
@@ -33,6 +35,39 @@ const PatientDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [specFilter, setSpecFilter] = useState("all");
   const [booked, setBooked] = useState(false);
+
+  // Appointment form state
+  const [selectedHospital, setSelectedHospital] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  const filteredDoctorsByHospital = useMemo(() => {
+    if (!selectedHospital) return [];
+    return doctors.filter((d) => d.hospital === selectedHospital);
+  }, [selectedHospital]);
+
+  const availableTimeSlots = useMemo(() => {
+    if (!selectedDoctor) return [];
+    const doc = doctors.find((d) => String(d.id) === selectedDoctor);
+    return doc?.timeSlots || [];
+  }, [selectedDoctor]);
+
+  const handleHospitalChange = (value: string) => {
+    setSelectedHospital(value);
+    setSelectedDoctor("");
+    setSelectedTimeSlot("");
+    setLoadingDoctors(true);
+    setTimeout(() => setLoadingDoctors(false), 400);
+  };
+
+  const handleDoctorChange = (value: string) => {
+    setSelectedDoctor(value);
+    setSelectedTimeSlot("");
+    setLoadingSlots(true);
+    setTimeout(() => setLoadingSlots(false), 400);
+  };
 
   const filteredDoctors = doctors.filter((d) => {
     const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase()) || d.hospital.toLowerCase().includes(searchQuery.toLowerCase());
