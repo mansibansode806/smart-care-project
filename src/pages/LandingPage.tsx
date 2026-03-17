@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
-import { Heart, Search, Bed, Calendar, AlertTriangle, Brain, Hospital, Users, Stethoscope, Phone, Mail, MapPin, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Heart, Search, Bed, Calendar, AlertTriangle, Brain, Hospital, Users, Stethoscope, Phone, Mail, MapPin, Clock, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
+import { LoginModal } from "@/components/LoginModal";
+import { SignupModal } from "@/components/SignupModal";
 
 const features = [
   { icon: Search, title: "Doctor Search", desc: "Find doctors by specialization and availability" },
@@ -22,6 +25,26 @@ const stats = [
 ];
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const session = localStorage.getItem("smartcare_session");
+    if (session) setUser(JSON.parse(session));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("smartcare_session");
+    setUser(null);
+  };
+
+  const handleLoginSuccess = (u: { name: string; email: string }) => {
+    setUser(u);
+    navigate("/patient");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
@@ -39,12 +62,21 @@ const LandingPage = () => {
             <Link to="/ai-prediction" className="text-sm font-medium text-muted-foreground hover:text-foreground">AI Predictions</Link>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/patient">Login</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link to="/patient">Sign Up</Link>
-            </Button>
+            {user ? (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/patient">Dashboard</Link>
+                </Button>
+                <Button size="sm" variant="ghost" onClick={handleLogout} className="gap-1.5">
+                  <LogOut className="h-4 w-4" /> Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)}>Login</Button>
+                <Button size="sm" onClick={() => setSignupOpen(true)}>Sign Up</Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -159,6 +191,8 @@ const LandingPage = () => {
         </div>
       </footer>
 
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} onSwitchToSignup={() => setSignupOpen(true)} onLoginSuccess={handleLoginSuccess} />
+      <SignupModal open={signupOpen} onOpenChange={setSignupOpen} onSwitchToLogin={() => setLoginOpen(true)} />
       <ChatbotWidget />
     </div>
   );
