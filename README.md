@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# 🏥 Smart Care – Healthcare Management System
 
-## Project info
+## 📌 Project Overview
+Smart Care is an integrated healthcare platform designed to simplify the process of booking doctor appointments, managing emergencies, and checking hospital resource availability such as beds.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The system aims to solve real-world healthcare challenges like long waiting times, lack of real-time information, and inefficient manual processes.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚀 Features
+- 👨‍⚕️ Doctor Search & Appointment Booking  
+- 🚑 Emergency Assistance Support  
+- 🏥 Real-time Bed Availability Tracking  
+- 🔐 Admin Login & Management System  
+- 📊 Organized Patient Data Handling  
+- 💻 User-friendly Interface  
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🛠️ Tech Stack
+- Frontend: React, TypeScript  
+- Styling: Tailwind CSS, shadcn-ui  
+- Build Tool: Vite  
+- Backend / Data: JSON Server / Database Concepts  
+- Version Control: Git & GitHub  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 📂 Project Structure
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+smart-care-connect-93/
+│── src/
+│── public/
+│── db.json
+│── package.json
+│── README.md
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## ⚙️ Installation & Setup
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Follow these steps to run the project locally:
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+git clone https://github.com/mansibansode806/smart-care-connect-93.git
+cd smart-care-connect-93
+npm install
 npm run dev
 ```
+🎯 Learning Outcomes
+Gained experience in building real-world healthcare solutions
+Learned frontend development using React & TypeScript
+Improved problem-solving and system design skills
+Understood how to manage and structure project data
+Developed teamwork and collaboration skills
+🌟 Future Improvements
+Integration with real-time hospital databases
+AI-based health recommendations
+Mobile application support
+Secure authentication system
+📎 Project Link
 
-**Edit a file directly in GitHub**
+👉 https://github.com/mansibansode806/smart-care-connect-93
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+👩‍💻 Author
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Manasi Bansode
+Aspiring AI & Software Developer
