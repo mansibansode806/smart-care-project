@@ -1,0 +1,300 @@
+{
+  "admins": [
+    {
+      "id": "1",
+      "username": "admin",
+      "password": "admin"
+    }
+  ],
+  "users": [
+    {
+      "name": "pranav",
+      "email": "pranav@gmail.com",
+      "phone": "1212121212",
+      "password": "123456",
+      "id": "nAr3yJp-kBY"
+    }
+  ],
+  "doctors": [
+    {
+      "id": "1",
+      "name": "Dr. Amit Mehta",
+      "specialization": "Cardiologist",
+      "qualification": "MD, DM Cardiology",
+      "experience": "15 years",
+      "hospital": "City Heart Hospital",
+      "available": "Mon-Fri, 9AM-5PM",
+      "timeSlots": [
+        "9:00 AM",
+        "11:00 AM",
+        "2:00 PM",
+        "4:00 PM"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Dr. Neha Sharma",
+      "specialization": "Neurologist",
+      "qualification": "MD, DM Neurology",
+      "experience": "12 years",
+      "hospital": "National Medical Center",
+      "available": "Mon-Sat, 10AM-4PM",
+      "timeSlots": [
+        "10:00 AM",
+        "12:00 PM",
+        "3:00 PM"
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Dr. Rahul Patil",
+      "specialization": "Orthopedic",
+      "qualification": "MS Orthopedics",
+      "experience": "10 years",
+      "hospital": "Sunrise Hospital",
+      "available": "Tue-Sat, 8AM-2PM",
+      "timeSlots": [
+        "8:00 AM",
+        "10:00 AM",
+        "1:00 PM"
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Dr. Sneha Kulkarni",
+      "specialization": "Pediatrician",
+      "qualification": "MD Pediatrics",
+      "experience": "8 years",
+      "hospital": "Children Care Hospital",
+      "available": "Mon-Fri, 11AM-6PM",
+      "timeSlots": [
+        "11:00 AM",
+        "1:00 PM",
+        "3:00 PM",
+        "5:00 PM"
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Dr. Anjali Desai",
+      "specialization": "Dermatologist",
+      "qualification": "MD Dermatology",
+      "experience": "9 years",
+      "hospital": "Metro General Hospital",
+      "available": "Mon-Thu, 9AM-3PM",
+      "timeSlots": [
+        "9:00 AM",
+        "11:00 AM",
+        "2:00 PM"
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Dr. Vikram Singh",
+      "specialization": "Cardiologist",
+      "qualification": "MD, DM Cardio",
+      "experience": "20 years",
+      "hospital": "Apollo Heart Center",
+      "available": "Mon-Sat, 8AM-1PM",
+      "timeSlots": [
+        "8:00 AM",
+        "9:30 AM",
+        "11:00 AM",
+        "12:30 PM"
+      ]
+    },
+    {
+      "id": "7",
+      "name": "Dr. Pooja Joshi",
+      "specialization": "Neurologist",
+      "qualification": "MD Neurology",
+      "experience": "7 years",
+      "hospital": "Metro General Hospital",
+      "available": "Mon-Fri, 10AM-5PM",
+      "timeSlots": [
+        "10:00 AM",
+        "1:00 PM",
+        "4:00 PM"
+      ]
+    },
+    {
+      "id": "8",
+      "name": "Dr. Rajesh Kapoor",
+      "specialization": "General Physician",
+      "qualification": "MBBS, MD",
+      "experience": "14 years",
+      "hospital": "National Medical Center",
+      "available": "Mon-Sat, 9AM-6PM",
+      "timeSlots": [
+        "9:00 AM",
+        "11:30 AM",
+        "2:00 PM",
+        "4:30 PM"
+      ]
+    },
+    {
+      "name": "Dr. Pranav Shah",
+      "specialization": "Cardiologiest",
+      "qualification": "MBBS",
+      "experience": "5 Yrs",
+      "hospital": "Baramati Hospital",
+      "available": "Mon-Sat ,6PM-9PM",
+      "timeSlots": [
+        "6 PM ",
+        "7 PM",
+        "8 PM"
+      ],
+      "id": "EtccIZQQhKM"
+    },
+    {
+      "id": "9",
+      "name": "Dr. Raj Deshpande",
+      "specialization": "Dentist",
+      "qualification": "MDS",
+      "experience": "8 years",
+      "hospital": "Noble Hospital",
+      "available": "Mon-Fri, 11AM-6PM",
+      "timeSlots": [
+        "11:00 AM",
+        "1:00 PM",
+        "3:00 PM",
+        "5:00 PM"
+      ]
+    }
+  ],
+  "hospitals": [
+    {
+      "id": "1",
+      "name": "City Heart Hospital",
+      "general": 45,
+      "icu": 8,
+      "emergency": 5
+    },
+    {
+      "id": "2",
+      "name": "Metro General Hospital",
+      "general": 120,
+      "icu": 15,
+      "emergency": 10
+    },
+    {
+      "id": "3",
+      "name": "National Medical Center",
+      "general": 200,
+      "icu": 25,
+      "emergency": 12
+    },
+    {
+      "id": "4",
+      "name": "Children Care Hospital",
+      "general": 60,
+      "icu": 10,
+      "emergency": 6
+    },
+    {
+      "id": "5",
+      "name": "Apollo Heart Center",
+      "general": 80,
+      "icu": 12,
+      "emergency": 8
+    },
+    {
+      "id": "6",
+      "name": "Noble Hospital",
+      "general": 90,
+      "icu": 20,
+      "emergency": 12
+    },
+    {
+      "id": "7",
+      "name": "Baramati Hospital",
+      "general": 50,
+      "icu": 10,
+      "emergency": 8
+    }
+  ],
+  "appointments": [
+    {
+      "patientName": "Pranav",
+      "hospital": "Apollo Heart Center",
+      "doctorId": "6",
+      "timeSlot": "11:00 AM",
+      "date": "2026-04-02",
+      "status": "completed",
+      "id": "QWY_WcSGU5E"
+    },
+    {
+      "patientName": "Mansi Bansode",
+      "hospital": "National Medical Center",
+      "doctorId": "8",
+      "timeSlot": "2:00 PM",
+      "date": "2026-03-30",
+      "status": "completed",
+      "id": "1et6NFEn1H0"
+    },
+    {
+      "patientName": "Sanika Chavan",
+      "hospital": "Metro General Hospital",
+      "doctorId": "5",
+      "timeSlot": "9:00 AM",
+      "date": "2026-03-29",
+      "status": "completed",
+      "id": "verIoEgvC48"
+    },
+    {
+      "patientName": "Shivani Bhoite",
+      "hospital": "Apollo Heart Center",
+      "doctorId": "6",
+      "timeSlot": "12:30 PM",
+      "date": "2026-03-31",
+      "status": "pending",
+      "id": "H6fGv8zGa-o"
+    },
+    {
+      "patientName": "Sai Shinde",
+      "hospital": "Noble Hospital",
+      "doctorId": "9",
+      "timeSlot": "3:00 PM",
+      "date": "2026-04-01",
+      "status": "pending",
+      "id": "abzLx5tqF-g"
+    },
+    {
+      "patientName": "Swarali Gholap",
+      "hospital": "Baramati Hospital",
+      "doctorId": "EtccIZQQhKM",
+      "timeSlot": "8 PM",
+      "date": "2026-04-14",
+      "status": "rejected",
+      "id": "Q9M88Gvdzko"
+    },
+    {
+      "patientName": "soham satav",
+      "hospital": "Baramati Hospital",
+      "doctorId": "EtccIZQQhKM",
+      "timeSlot": "6 PM ",
+      "date": "2026-04-12",
+      "status": "pending",
+      "id": "EamESSU_cz4"
+    },
+    {
+      "patientName": "manasi",
+      "hospital": "Metro General Hospital",
+      "doctorId": "5",
+      "timeSlot": "9:00 AM",
+      "date": "2026-04-13",
+      "status": "pending",
+      "id": "XjRj1u-WbzA"
+    },
+    {
+      "patientName": "soham raut",
+      "hospital": "Children Care Hospital",
+      "doctorId": "4",
+      "timeSlot": "11:00 AM",
+      "date": "2026-05-20",
+      "status": "accepted",
+      "id": "KmLPxglx7D8"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

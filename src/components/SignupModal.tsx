@@ -22,36 +22,48 @@ export const SignupModal = ({ open, onOpenChange, onSwitchToLogin }: SignupModal
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const handleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    if (!name.trim()) { setError("Full name is required."); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Please enter a valid email."); return; }
-    if (!phone.trim()) { setError("Phone number is required."); return; }
-    if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
-    if (password !== confirm) { setError("Passwords do not match."); return; }
+  if (!name.trim()) { setError("Full name is required."); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Please enter a valid email."); return; }
+  if (!phone.trim()) { setError("Phone number is required."); return; }
+  if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
+  if (password !== confirm) { setError("Passwords do not match."); return; }
 
-    setLoading(true);
+  setLoading(true);
 
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem("smartcare_users") || "[]");
-      if (users.some((u: any) => u.email === email)) {
-        setError("An account with this email already exists.");
-        setLoading(false);
-        return;
-      }
+  try {
+    const response = await fetch("http://localhost:3001/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name.trim(),
+        email,
+        phone: phone.trim(),
+        password
+      })
+    });
 
-      users.push({ name: name.trim(), email, phone: phone.trim(), password });
-      localStorage.setItem("smartcare_users", JSON.stringify(users));
+    const data = await response.json();
 
-      toast({ title: "Registration successful!", description: "Please login with your credentials." });
-      onOpenChange(false);
-      resetForm();
-      onSwitchToLogin();
-      setLoading(false);
-    }, 600);
-  };
+    toast({
+      title: "Registration successful!",
+      description: "Please login with your credentials."
+    });
+
+    onOpenChange(false);
+    resetForm();
+    onSwitchToLogin();
+  } catch (error) {
+    setError("Error saving user.");
+  }
+
+  setLoading(false);
+};
 
   const resetForm = () => {
     setName(""); setEmail(""); setPhone(""); setPassword(""); setConfirm(""); setError("");

@@ -20,38 +20,48 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToSignup, onLoginSucces
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address.");
-      return;
+  if (!email || !password) {
+    setError("Enter email and password.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetch("http://localhost:3001/users");
+    const users = await response.json();
+
+    const found = users.find(
+      (u: any) => u.email === email && u.password === password
+    );
+
+    if (found) {
+      localStorage.setItem(
+        "smartcare_session",
+        JSON.stringify({ name: found.name, email: found.email })
+      );
+
+      toast({
+        title: "Welcome back!",
+        description: `Logged in as ${found.name}`
+      });
+
+      onLoginSuccess({ name: found.name, email: found.email });
+      onOpenChange(false);
+      resetForm();
+    } else {
+      setError("Invalid email or password.");
     }
-    if (!password) {
-      setError("Password cannot be empty.");
-      return;
-    }
+  } catch (error) {
+    setError("Server error.");
+  }
 
-    setLoading(true);
-
-    // Simulate auth – check localStorage for registered users
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem("smartcare_users") || "[]");
-      const found = users.find((u: any) => u.email === email && u.password === password);
-
-      if (found) {
-        localStorage.setItem("smartcare_session", JSON.stringify({ name: found.name, email: found.email }));
-        toast({ title: "Welcome back!", description: `Logged in as ${found.name}` });
-        onLoginSuccess({ name: found.name, email: found.email });
-        onOpenChange(false);
-        resetForm();
-      } else {
-        setError("Invalid email or password.");
-      }
-      setLoading(false);
-    }, 600);
-  };
+  setLoading(false);
+};
 
   const resetForm = () => {
     setEmail("");

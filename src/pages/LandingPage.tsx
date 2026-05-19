@@ -55,11 +55,23 @@ const LandingPage = () => {
             <span className="font-display text-xl font-bold text-foreground">SmartCare</span>
           </Link>
           <div className="hidden items-center gap-6 md:flex">
-            <Link to="/emergency" className="text-sm font-medium text-muted-foreground hover:text-foreground">Emergency</Link>
-            <Link to="/queue" className="text-sm font-medium text-muted-foreground hover:text-foreground">Queue</Link>
+            <Link to="/patient" className="text-sm font-medium text-muted-foreground hover:text-foreground">Doctors</Link>
+            {/* <Link to="/queue" className="text-sm font-medium text-muted-foreground hover:text-foreground">Queue</Link> */}
             <Link to="/patient" className="text-sm font-medium text-muted-foreground hover:text-foreground">Patient Portal</Link>
-            <Link to="/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground">Admin</Link>
-            <Link to="/ai-prediction" className="text-sm font-medium text-muted-foreground hover:text-foreground">AI Predictions</Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (user) {
+                  alert("Please logout from patient account to access Admin Panel.");
+                } else {
+                  navigate("/admin-login");
+                }
+              }}
+            >
+              Admin
+            </Button>
+            {/* <Link to="/ai-prediction" className="text-sm font-medium text-muted-foreground hover:text-foreground">AI Predictions</Link> */}
           </div>
           <div className="flex items-center gap-3">
             {user ? (
@@ -97,10 +109,14 @@ const LandingPage = () => {
             </p>
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" className="gap-2 px-8" asChild>
-                <Link to="/patient"><Calendar className="h-5 w-5" /> Book Appointment</Link>
+                <Link to="/patient" state={{ tab: "appointment" }}>
+                  <Calendar className="h-5 w-5" /> Book Appointment
+                </Link>
               </Button>
               <Button size="lg" variant="outline" className="gap-2 px-8" asChild>
-                <Link to="/patient"><Bed className="h-5 w-5" /> Check Bed Availability</Link>
+                <Link to="/patient" state={{ tab: "beds" }}>
+                  <Bed className="h-5 w-5" /> Check Bed Availability
+                </Link>
               </Button>
               <Button size="lg" variant="destructive" className="gap-2 px-8 emergency-pulse" asChild>
                 <Link to="/emergency"><AlertTriangle className="h-5 w-5" /> Emergency Mode</Link>

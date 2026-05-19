@@ -1,5 +1,7 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+
+// export default PatientDashboard;
+import { useState, useMemo,useEffect } from "react";
+import { Link, useLocation} from "react-router-dom";
 import { Heart, Search, Calendar, Bed, Stethoscope, Clock, MapPin, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,33 +10,34 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
 
-const doctors = [
-  { id: 1, name: "Dr. Sarah Chen", specialization: "Cardiologist", qualification: "MD, FACC", experience: "15 years", hospital: "City Heart Hospital", available: "Mon-Fri, 9AM-5PM", timeSlots: ["9:00 AM", "11:00 AM", "2:00 PM", "4:00 PM"] },
-  { id: 2, name: "Dr. James Wilson", specialization: "Neurologist", qualification: "MD, PhD", experience: "12 years", hospital: "City Heart Hospital", available: "Mon-Sat, 10AM-4PM", timeSlots: ["10:00 AM", "12:00 PM", "3:00 PM"] },
-  { id: 3, name: "Dr. Priya Sharma", specialization: "Orthopedic", qualification: "MS Ortho", experience: "10 years", hospital: "National Medical Center", available: "Tue-Sat, 8AM-2PM", timeSlots: ["8:00 AM", "10:00 AM", "1:00 PM"] },
-  { id: 4, name: "Dr. Michael Brown", specialization: "Pediatrician", qualification: "MD Pediatrics", experience: "8 years", hospital: "Children's Care Hospital", available: "Mon-Fri, 11AM-6PM", timeSlots: ["11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM"] },
-  { id: 5, name: "Dr. Anita Patel", specialization: "Dermatologist", qualification: "MD Dermatology", experience: "9 years", hospital: "Metro General Hospital", available: "Mon-Thu, 9AM-3PM", timeSlots: ["9:00 AM", "11:00 AM", "2:00 PM"] },
-  { id: 6, name: "Dr. Robert Lee", specialization: "Cardiologist", qualification: "MD, DM Cardio", experience: "20 years", hospital: "Apollo Heart Center", available: "Mon-Sat, 8AM-1PM", timeSlots: ["8:00 AM", "9:30 AM", "11:00 AM", "12:30 PM"] },
-  { id: 7, name: "Dr. Emily Davis", specialization: "Neurologist", qualification: "MD Neurology", experience: "7 years", hospital: "Metro General Hospital", available: "Mon-Fri, 10AM-5PM", timeSlots: ["10:00 AM", "1:00 PM", "4:00 PM"] },
-  { id: 8, name: "Dr. Raj Kapoor", specialization: "General Physician", qualification: "MBBS, MD", experience: "14 years", hospital: "National Medical Center", available: "Mon-Sat, 9AM-6PM", timeSlots: ["9:00 AM", "11:30 AM", "2:00 PM", "4:30 PM"] },
-];
 
-const hospitals = [
-  { name: "City Heart Hospital", general: 45, icu: 8, emergency: 5 },
-  { name: "Metro General Hospital", general: 120, icu: 15, emergency: 10 },
-  { name: "National Medical Center", general: 200, icu: 25, emergency: 12 },
-  { name: "Children's Care Hospital", general: 60, icu: 10, emergency: 6 },
-  { name: "Apollo Heart Center", general: 80, icu: 12, emergency: 8 },
-  { name: "Sunshine Medical", general: 0, icu: 0, emergency: 2 },
-];
 
 type Tab = "doctors" | "appointment" | "beds";
 
 const PatientDashboard = () => {
-  const [tab, setTab] = useState<Tab>("doctors");
+  const location = useLocation();
+const initialTab = (location.state as any)?.tab || "doctors";
+const [tab, setTab] = useState<Tab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [specFilter, setSpecFilter] = useState("all");
   const [booked, setBooked] = useState(false);
+  const [doctors, setDoctors] = useState<any[]>([]);
+const [hospitals, setHospitals] = useState<any[]>([]);
+
+const tabs: { key: Tab; label: string; icon: any }[] = [
+  { key: "doctors", label: "Search Doctor", icon: Search },
+  { key: "appointment", label: "Book Appointment", icon: Calendar },
+  { key: "beds", label: "Bed Availability", icon: Bed },
+];
+useEffect(() => {
+  if ((location.state as any)?.tab) {
+    setTab((location.state as any).tab);
+  }
+}, [location.state]);
+  // Validation states
+  const [patientName, setPatientName] = useState("");
+  const [nameError, setNameError] = useState("");
+  const today = new Date().toISOString().split("T")[0];
 
   // Appointment form state
   const [selectedHospital, setSelectedHospital] = useState("");
@@ -42,6 +45,38 @@ const PatientDashboard = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+ 
+
+useEffect(() => {
+  fetchDoctors();
+  fetchHospitals();
+}, []);
+
+
+const fetchDoctors = async () => {
+  const res = await fetch("http://localhost:3001/doctors");
+  const data = await res.json();
+  setDoctors(data);
+};
+
+const fetchHospitals = async () => {
+  const res = await fetch("http://localhost:3001/hospitals");
+  const data = await res.json();
+  setHospitals(data);
+};
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const regex = /^[A-Za-z\s]*$/;
+
+    if (regex.test(value)) {
+      setPatientName(value);
+      setNameError("");
+    } else {
+      setNameError("Name should contain only letters");
+    }
+  };
 
   const filteredDoctorsByHospital = useMemo(() => {
     if (!selectedHospital) return [];
@@ -77,14 +112,35 @@ const PatientDashboard = () => {
 
   const specializations = [...new Set(doctors.map((d) => d.specialization))];
 
-  const tabs: { key: Tab; label: string; icon: typeof Search }[] = [
-    { key: "doctors", label: "Search Doctor", icon: Search },
-    { key: "appointment", label: "Book Appointment", icon: Calendar },
-    { key: "beds", label: "Bed Availability", icon: Bed },
-  ];
+  
+
+  const handleBookAppointment = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    await fetch("http://localhost:3001/appointments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        patientName: patientName,
+        hospital: selectedHospital,
+        doctorId: selectedDoctor,
+        timeSlot: selectedTimeSlot,
+        date: (document.querySelector('input[type="date"]') as HTMLInputElement)?.value,
+        status: "pending"
+      })
+    });
+
+    setBooked(true);
+  } catch (error) {
+    console.log("Error booking appointment");
+  }
+};
 
   return (
-    <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
@@ -107,6 +163,8 @@ const PatientDashboard = () => {
         {/* Tab Nav */}
         <div className="mb-6 flex gap-2 overflow-x-auto">
           {tabs.map((t) => (
+            // const Icon = t.icon;
+            
             <button
               key={t.key}
               onClick={() => { setTab(t.key); setBooked(false); }}
@@ -114,6 +172,7 @@ const PatientDashboard = () => {
             >
               <t.icon className="h-4 w-4" /> {t.label}
             </button>
+  
           ))}
         </div>
 
@@ -159,78 +218,109 @@ const PatientDashboard = () => {
           </div>
         )}
 
-        {/* Book Appointment */}
+        {/* Appointment Tab */}
         {tab === "appointment" && (
           <Card className="mx-auto max-w-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-display"><Calendar className="h-5 w-5 text-primary" /> Book Appointment</CardTitle>
+              <CardTitle>Book Appointment</CardTitle>
             </CardHeader>
             <CardContent>
               {booked ? (
                 <div className="py-8 text-center">
-                  <CheckCircle className="mx-auto mb-4 h-16 w-16 text-success" />
-                  <h3 className="font-display text-xl font-bold text-foreground">Appointment Confirmed!</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">You will receive a confirmation via email.</p>
+                  <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-500" />
+                  <h3 className="text-xl font-bold">Appointment Confirmed!</h3>
                   <Button className="mt-6" onClick={() => setBooked(false)}>Book Another</Button>
                 </div>
               ) : (
-                <form onSubmit={(e) => { e.preventDefault(); setBooked(true); }} className="space-y-4">
-                  <div><Label>Patient Name</Label><Input placeholder="Your full name" required /></div>
+                <form onSubmit={handleBookAppointment} className="space-y-4">
+                  {/* Patient Name */}
+                  <div>
+                    <Label>Patient Name</Label>
+                    <Input
+                      placeholder="Your full name"
+                      value={patientName}
+                      onChange={handleNameChange}
+                      required
+                    />
+                    {nameError && (
+                      <p className="text-red-500 text-sm">{nameError}</p>
+                    )}
+                  </div>
+
+                  {/* Hospital */}
                   <div>
                     <Label>Hospital</Label>
-                    <Select value={selectedHospital} onValueChange={handleHospitalChange} required>
+                    <Select value={selectedHospital} onValueChange={handleHospitalChange}>
                       <SelectTrigger><SelectValue placeholder="Select hospital" /></SelectTrigger>
-                      <SelectContent>{hospitals.map((h) => <SelectItem key={h.name} value={h.name}>{h.name}</SelectItem>)}</SelectContent>
+                      <SelectContent>
+                        {hospitals.map((h) => (
+                          <SelectItem key={h.name} value={h.name}>{h.name}</SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Doctor */}
                   <div>
                     <Label>Doctor</Label>
                     {loadingDoctors ? (
-                      <div className="flex items-center gap-2 rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Loading doctors...
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="animate-spin h-4 w-4" /> Loading doctors...
                       </div>
                     ) : (
-                      <Select value={selectedDoctor} onValueChange={handleDoctorChange} disabled={!selectedHospital} required>
-                        <SelectTrigger><SelectValue placeholder={selectedHospital ? "Select doctor" : "Select a hospital first"} /></SelectTrigger>
+                      <Select value={selectedDoctor} onValueChange={handleDoctorChange} disabled={!selectedHospital}>
+                        <SelectTrigger><SelectValue placeholder="Select doctor" /></SelectTrigger>
                         <SelectContent>
-                          {filteredDoctorsByHospital.length === 0 ? (
-                            <div className="px-3 py-2 text-sm text-muted-foreground">No doctors available for this hospital</div>
-                          ) : (
-                            filteredDoctorsByHospital.map((d) => <SelectItem key={d.id} value={String(d.id)}>{d.name} – {d.specialization}</SelectItem>)
-                          )}
+                          {filteredDoctorsByHospital.map((d) => (
+                            <SelectItem key={d.id} value={String(d.id)}>
+                              {d.name} – {d.specialization}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     )}
                   </div>
+
+                  {/* Date + Time */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div><Label>Date</Label><Input type="date" required /></div>
+                    <div>
+                      <Label>Date</Label>
+                      <Input type="date" min={today} required />
+                    </div>
+
                     <div>
                       <Label>Time Slot</Label>
-                      {loadingSlots ? (
-                        <div className="flex items-center gap-2 rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" /> Loading slots...
-                        </div>
-                      ) : (
-                        <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot} disabled={!selectedDoctor} required>
-                          <SelectTrigger><SelectValue placeholder={selectedDoctor ? "Select time" : "Select a doctor first"} /></SelectTrigger>
-                          <SelectContent>
-                            {availableTimeSlots.length === 0 ? (
-                              <div className="px-3 py-2 text-sm text-muted-foreground">No slots available</div>
-                            ) : (
-                              availableTimeSlots.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)
-                            )}
-                          </SelectContent>
-                        </Select>
-                      )}
+                      <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot} disabled={!selectedDoctor}>
+                        <SelectTrigger><SelectValue placeholder="Select time" /></SelectTrigger>
+                        <SelectContent>
+                          {availableTimeSlots.map((t) => (
+                            <SelectItem key={t} value={t}>{t}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full" disabled={!selectedHospital || !selectedDoctor || !selectedTimeSlot}>Confirm Appointment</Button>
+
+                  {/* Submit */}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={
+                      !patientName ||
+                      nameError !== "" ||
+                      !selectedHospital ||
+                      !selectedDoctor ||
+                      !selectedTimeSlot
+                      }
+                  >
+                    Confirm Appointment
+                  </Button>
+
                 </form>
               )}
             </CardContent>
           </Card>
         )}
-
         {/* Bed Availability */}
         {tab === "beds" && (
           <div className="overflow-x-auto">
@@ -269,6 +359,7 @@ const PatientDashboard = () => {
           </div>
         )}
       </div>
+
       <ChatbotWidget />
     </div>
   );

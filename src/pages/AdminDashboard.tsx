@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { Link } from "react-router-dom";
 import { Heart, Bed, Users, Stethoscope, Calendar, BarChart3, ArrowLeft, Plus, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,20 +23,27 @@ const appointmentData = [
   { day: "Thu", count: 52 }, { day: "Fri", count: 48 }, { day: "Sat", count: 28 }, { day: "Sun", count: 15 },
 ];
 
-const mockAppointments = [
-  { id: 1, patient: "John Doe", doctor: "Dr. Sarah Chen", date: "2026-03-15", time: "10:00 AM", status: "pending" },
-  { id: 2, patient: "Jane Smith", doctor: "Dr. James Wilson", date: "2026-03-15", time: "11:00 AM", status: "pending" },
-  { id: 3, patient: "Bob Johnson", doctor: "Dr. Priya Sharma", date: "2026-03-16", time: "2:00 PM", status: "accepted" },
-  { id: 4, patient: "Alice Brown", doctor: "Dr. Robert Lee", date: "2026-03-16", time: "3:00 PM", status: "pending" },
-];
+
 
 type AdminTab = "overview" | "beds" | "doctors" | "appointments" | "analytics";
 
 const AdminDashboard = () => {
+  
   const [tab, setTab] = useState<AdminTab>("overview");
   const [beds, setBeds] = useState({ total: 250, available: 70, icu: 25, emergency: 12 });
-  const [appointments, setAppointments] = useState(mockAppointments);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [showDoctorForm, setShowDoctorForm] = useState(false);
+const [doctorName, setDoctorName] = useState("");
+const [specialization, setSpecialization] = useState("");
+const [availability, setAvailability] = useState("");
+const [qualification, setQualification] = useState("");
+const [experience, setExperience] = useState("");
+const [hospital, setHospital] = useState("");
+const [timeSlots, setTimeSlots] = useState("");
 
+ // Doctor States
+  const [doctors, setDoctors] = useState<any[]>([]);
+  
   const tabs: { key: AdminTab; label: string; icon: typeof Bed }[] = [
     { key: "overview", label: "Overview", icon: BarChart3 },
     { key: "beds", label: "Bed Status", icon: Bed },
@@ -45,10 +52,80 @@ const AdminDashboard = () => {
     { key: "analytics", label: "Analytics", icon: BarChart3 },
   ];
 
-  const handleAppointment = (id: number, action: "accepted" | "rejected") => {
-    setAppointments((a) => a.map((ap) => (ap.id === id ? { ...ap, status: action } : ap)));
+  const handleAppointmentStatus = async (id: number, status: string) => {
+  const appointment = appointments.find((a) => a.id === id);
+
+  await fetch(`http://localhost:3001/appointments/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      ...appointment,
+      status: status
+    })
+  });
+
+  fetchAppointments();
+};
+  
+  const fetchAppointments = async () => {
+  const res = await fetch("http://localhost:3001/appointments");
+  const data = await res.json();
+  setAppointments(data);
+};
+  // Load doctors from JSON server
+  useEffect(() => {
+    fetchDoctors();
+    fetchAppointments();
+  }, []);
+
+  const fetchDoctors = async () => {
+    const res = await fetch("http://localhost:3001/doctors");
+    const data = await res.json();
+    setDoctors(data);
   };
 
+  const handleAddDoctor = async () => {
+  await fetch("http://localhost:3001/doctors", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: doctorName,
+      specialization: specialization,
+      qualification: qualification,
+      experience: experience,
+      hospital: hospital,
+      available: availability,
+      timeSlots: timeSlots.split(",")
+    })
+  });
+
+  setDoctorName("");
+  setSpecialization("");
+  setQualification("");
+  setExperience("");
+  setHospital("");
+  setAvailability("");
+  setTimeSlots("");
+  setShowDoctorForm(false);
+
+  fetchDoctors();
+};
+const handleDeleteDoctor = async (id: number) => {
+  try {
+    await fetch(`http://localhost:3001/doctors/${id}`, {
+      method: "DELETE"
+    });
+
+    // reload doctors after delete
+    fetchDoctors();
+  } catch (error) {
+    console.log("Error deleting doctor");
+  }
+};
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
@@ -117,60 +194,116 @@ const AdminDashboard = () => {
           </Card>
         )}
 
+        {/* Doctors */}
         {tab === "doctors" && (
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold">Doctor Management</h2>
-              <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" /> Add Doctor</Button>
+            <div className="mb-4 flex justify-between">
+              <h2 className="text-xl font-bold">Doctor Management</h2>
+              <Button onClick={() => setShowDoctorForm(true)}>
+                <Plus className="h-4 w-4" /> Add Doctor
+              </Button>
             </div>
-            <div className="overflow-x-auto rounded-lg border">
-              <table className="w-full text-sm">
-                <thead><tr className="border-b bg-muted">
-                  <th className="p-3 text-left font-display font-semibold">Name</th>
-                  <th className="p-3 text-left font-display font-semibold">Specialization</th>
-                  <th className="p-3 text-left font-display font-semibold">Availability</th>
-                </tr></thead>
-                <tbody>
-                  {[
-                    { name: "Dr. Sarah Chen", spec: "Cardiologist", avail: "Mon-Fri, 9AM-5PM" },
-                    { name: "Dr. James Wilson", spec: "Neurologist", avail: "Mon-Sat, 10AM-4PM" },
-                    { name: "Dr. Priya Sharma", spec: "Orthopedic", avail: "Tue-Sat, 8AM-2PM" },
-                    { name: "Dr. Robert Lee", spec: "Cardiologist", avail: "Mon-Sat, 8AM-1PM" },
-                  ].map((d) => (
-                    <tr key={d.name} className="border-b hover:bg-muted/50">
-                      <td className="p-3 font-medium">{d.name}</td>
-                      <td className="p-3 text-muted-foreground">{d.spec}</td>
-                      <td className="p-3 text-muted-foreground">{d.avail}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+            {showDoctorForm && (
+              <Card className="mb-4 max-w-md">
+                <CardHeader><CardTitle>Add Doctor</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  <Input placeholder="Doctor Name" value={doctorName} onChange={(e) => setDoctorName(e.target.value)} />
+                  <Input placeholder="Specialization" value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
+                  <Input placeholder="Qualification" value={qualification} onChange={(e) => setQualification(e.target.value)} />
+                  <Input placeholder="Experience (e.g., 10 years)" value={experience} onChange={(e) => setExperience(e.target.value)} />
+                  <Input placeholder="Hospital Name" value={hospital} onChange={(e) => setHospital(e.target.value)} />
+                  <Input placeholder="Available (e.g., Mon-Fri, 9AM-5PM)" value={availability} onChange={(e) => setAvailability(e.target.value)} />
+                  <Input placeholder="Time Slots (comma separated)" value={timeSlots} onChange={(e) => setTimeSlots(e.target.value)} />
+                  <Button onClick={handleAddDoctor} className="w-full">Save Doctor</Button>
+                </CardContent>
+              </Card>
+            )}
+
+            <table className="w-full border">
+              <thead>
+                <tr className="bg-muted">
+                  <th className="p-2">Name</th>
+                  <th className="p-2">Specialization</th>
+                  {/* <th className="p-2">Availability</th> */}
+                  <th className="p-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {doctors.map((d) => (
+                  <tr key={d.id} className="border text-center">
+                    <td className="p-2">{d.name}</td>
+                    <td className="p-2">{d.specialization}</td>
+                    {/* <td className="p-2">{d.availability}</td> */}
+                    <td className="p-2">
+                      <Button variant="destructive" onClick={() => handleDeleteDoctor(d.id)}>Delete</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
         {tab === "appointments" && (
-          <div className="space-y-3">
-            {appointments.map((a) => (
-              <div key={a.id} className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-medium text-foreground">{a.patient}</p>
-                  <p className="text-sm text-muted-foreground">{a.doctor} · {a.date} · {a.time}</p>
-                </div>
-                {a.status === "pending" ? (
-                  <div className="flex gap-2">
-                    <Button size="sm" className="gap-1" onClick={() => handleAppointment(a.id, "accepted")}><Check className="h-4 w-4" /> Accept</Button>
-                    <Button size="sm" variant="outline" className="gap-1" onClick={() => handleAppointment(a.id, "rejected")}><X className="h-4 w-4" /> Reject</Button>
-                  </div>
-                ) : (
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${a.status === "accepted" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-                    {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
-                  </span>
-                )}
-              </div>
-            ))}
+  <div className="space-y-3">
+    {appointments.map((a) => (
+      <div key={a.id} className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-medium text-foreground">{a.patientName}</p>
+          <p className="text-sm text-muted-foreground">
+            {a.hospital} · {a.date} · {a.timeSlot}
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        {a.status === "pending" && (
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => handleAppointmentStatus(a.id, "accepted")}
+            >
+              Accept
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAppointmentStatus(a.id, "rejected")}
+            >
+              Reject
+            </Button>
           </div>
         )}
+
+        {a.status === "accepted" && (
+          <div className="flex gap-2">
+            <span className="px-3 py-1 bg-green-100 text-green-700 rounded">
+              Accepted
+            </span>
+            <Button
+              size="sm"
+              onClick={() => handleAppointmentStatus(a.id, "completed")}
+            >
+              Completed
+            </Button>
+          </div>
+        )}
+
+        {a.status === "completed" && (
+          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded">
+            Completed
+          </span>
+        )}
+
+        {a.status === "rejected" && (
+          <span className="px-3 py-1 bg-red-100 text-red-700 rounded">
+            Rejected
+          </span>
+        )}
+      </div>
+    ))}
+  </div>
+)}
 
         {tab === "analytics" && (
           <div className="grid gap-6 lg:grid-cols-2">
