@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:5001/api";
 
-const AdminLogin = () => {
+const HospitalLogin = () => {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,21 +16,21 @@ const AdminLogin = () => {
 
     setError("");
 
-    if (!username || !password) {
-      setError("Please enter Admin ID and password.");
+    if (!email || !password) {
+      setError("Please enter email and password.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/admin-login`, {
+      const response = await fetch(`${API_URL}/hospital-login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username.trim(),
+          email: email.trim(),
           password,
         }),
       });
@@ -38,19 +38,20 @@ const AdminLogin = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Invalid Admin ID or password.");
+        setError(data.message || "Invalid hospital login.");
         return;
       }
 
+      // Save hospital session
       localStorage.setItem(
-        "smartcare_admin_session",
-        JSON.stringify(data.admin)
+        "smartcare_hospital_session",
+        JSON.stringify(data.hospital)
       );
 
-      navigate("/admin-dashboard");
+      // Go to hospital dashboard
+      navigate("/hospital-dashboard");
     } catch (error) {
       console.error(error);
-
       setError(
         "Unable to connect to the server. Please make sure the backend is running."
       );
@@ -63,28 +64,30 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
 
+        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
             SmartCare
           </h1>
 
           <p className="text-gray-500 mt-2">
-            Admin Login
+            Hospital Administration Login
           </p>
         </div>
 
+        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-5">
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Admin ID
+              Hospital Email
             </label>
 
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter Admin ID"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter hospital email"
               className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -104,7 +107,7 @@ const AdminLogin = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg p-3">
+            <div className="bg-red-50 text-red-600 text-sm rounded-lg p-3">
               {error}
             </div>
           )}
@@ -114,17 +117,34 @@ const AdminLogin = () => {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Logging in..." : "Hospital Login"}
           </button>
+
         </form>
 
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm font-semibold text-blue-800">
-            SmartCare Admin
+        {/* Hospital Registration */}
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-500">
+            New hospital?
           </p>
 
-          <p className="text-xs text-blue-700 mt-1">
-            Authorized administrators can manage hospitals and system data.
+          <button
+            type="button"
+            onClick={() => navigate("/hospital-register")}
+            className="text-blue-600 font-semibold hover:underline mt-1"
+          >
+            Register your hospital
+          </button>
+        </div>
+
+        {/* Demo Information */}
+        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm font-semibold text-yellow-800">
+            Prototype Demo
+          </p>
+
+          <p className="text-xs text-yellow-700 mt-1">
+            Hospital credentials are configured for the SIH prototype.
           </p>
         </div>
 
@@ -133,4 +153,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default HospitalLogin;

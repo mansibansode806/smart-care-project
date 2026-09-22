@@ -1,8 +1,15 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes ,Navigate} from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+
 import LandingPage from "./pages/LandingPage";
 import QueuePage from "./pages/QueuePage";
 import PatientDashboard from "./pages/PatientDashboard";
@@ -11,35 +18,107 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AIPrediction from "./pages/AIPrediction";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
+import HospitalDashboard from "./pages/HospitalDashboard";
+import HospitalLogin from "./pages/HospitalLogin";
+import HospitalRegister from "./pages/HospitalRegister";
 
 const queryClient = new QueryClient();
-// Protected Route
-const AdminRoute = ({ children }: any) => {
-  const isAdmin = localStorage.getItem("adminLoggedIn");
-  const isUser = localStorage.getItem("smartcare_session");
 
-  if (isUser) {
-    return <Navigate to="/" />;
+// ===============================
+// PROTECTED ADMIN ROUTE
+// ===============================
+
+const AdminRoute = ({ children }: any) => {
+  const adminSession = localStorage.getItem("smartcare_admin_session");
+  const patientSession = localStorage.getItem("smartcare_session");
+
+  // If patient is logged in, don't allow admin panel
+  if (patientSession) {
+    return <Navigate to="/" replace />;
   }
-  return isAdmin ? children : <Navigate to="/admin-login" />;
+
+  // If admin is not logged in, go to admin login
+  if (!adminSession) {
+    return <Navigate to="/admin-login" replace />;
+  }
+
+  return children;
 };
+
+// ===============================
+// APP
+// ===============================
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
+
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/patient" element={<PatientDashboard />} />
-          <Route path="/emergency" element={<EmergencyPage />} />
-          {/* <Route path="/admin" element={<AdminDashboard />} /> */}
-          <Route path="/queue" element={<QueuePage />} />
-          {/* <Route path="/ai-prediction" element={<AIPrediction />} /> */}
-          {/* Admin Login */}
-          <Route path="/admin-login" element={<AdminLogin />} />
 
-          {/* Protected Admin Dashboard */}
+          {/* ===============================
+              LANDING PAGE
+          =============================== */}
+          <Route
+            path="/"
+            element={<LandingPage />}
+          />
+
+          {/* ===============================
+              PATIENT DASHBOARD
+          =============================== */}
+          <Route
+            path="/patient"
+            element={<PatientDashboard />}
+          />
+
+          {/* ===============================
+              EMERGENCY
+          =============================== */}
+          <Route
+            path="/emergency"
+            element={<EmergencyPage />}
+          />
+
+          {/* ===============================
+              QUEUE
+          =============================== */}
+          <Route
+            path="/queue"
+            element={<QueuePage />}
+          />
+
+          {/* ===============================
+              AI PREDICTION
+          =============================== */}
+          <Route
+            path="/ai-prediction"
+            element={<AIPrediction />}
+          />
+
+          {/* ===============================
+              ADMIN LOGIN
+          =============================== */}
+          <Route
+            path="/admin-login"
+            element={<AdminLogin />}
+          />
+
+          {/* ===============================
+              ADMIN DASHBOARD
+              =============================== */}
+          <Route
+            path="/admin-dashboard"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+
+          {/* Keep /admin working too */}
           <Route
             path="/admin"
             element={
@@ -48,7 +127,39 @@ const App = () => (
               </AdminRoute>
             }
           />
-          <Route path="*" element={<NotFound />} />
+
+          {/* ===============================
+              HOSPITAL LOGIN
+          =============================== */}
+          <Route
+            path="/hospital-login"
+            element={<HospitalLogin />}
+          />
+
+          {/* ===============================
+              HOSPITAL REGISTRATION
+          =============================== */}
+          <Route
+            path="/hospital-register"
+            element={<HospitalRegister />}
+          />
+
+          {/* ===============================
+              HOSPITAL DASHBOARD
+          =============================== */}
+          <Route
+            path="/hospital-dashboard"
+            element={<HospitalDashboard />}
+          />
+
+          {/* ===============================
+              404
+          =============================== */}
+          <Route
+            path="*"
+            element={<NotFound />}
+          />
+
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

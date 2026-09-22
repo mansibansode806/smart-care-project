@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { MessageCircle, X, Send, Bed, Calendar, Search, AlertTriangle } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Bed,
+  Calendar,
+  Search,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const quickReplies = [
@@ -9,91 +17,194 @@ const quickReplies = [
   { label: "Emergency Help", icon: AlertTriangle },
 ];
 
-const botResponses: Record<string, string> = {
-  "check bed availability": "You can check real-time bed availability in the Patient Dashboard. We currently have 8,500+ beds across 120+ partner hospitals. Would you like me to guide you there?",
-  "book appointment": "To book an appointment, go to the Patient Dashboard and select 'Book Appointment'. You can choose your preferred doctor, hospital, date and time slot.",
-  "find doctor": "You can search for doctors by name or specialization in the Patient Dashboard. We have 2,400+ doctors across various specializations.",
-  "emergency help": "🚨 For emergencies, please call 108 immediately or use our Emergency Mode which shows nearest hospitals with ICU availability sorted by proximity.",
-  "symptoms of fever": "Common fever symptoms include: elevated body temperature (>98.6°F), chills, sweating, headache, muscle aches, and fatigue. Please consult a doctor if fever persists beyond 3 days.",
-  "chest pain": "For chest pain, please seek immediate medical attention. Visit a cardiologist or use our Emergency Mode. Call 108 if the pain is severe.",
-};
-
-function getBotReply(msg: string): string {
-  const lower = msg.toLowerCase();
-  for (const [key, val] of Object.entries(botResponses)) {
-    if (lower.includes(key)) return val;
-  }
-  return "I can help you with booking appointments, checking bed availability, finding doctors, and emergency assistance. How can I help you today?";
-}
-
 export function ChatbotWidget() {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: "user" | "bot"; text: string }[]>([
-    { role: "bot", text: "Hi! I'm SmartCare Assistant. How can I help you today?" },
+  const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<
+    { sender: "user" | "bot"; text: string }[]
+  >([
+    {
+      sender: "bot",
+      text: "Hello! I'm SmartCare's AI Health Assistant. How can I help you today?",
+    },
   ]);
-  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const send = (text: string) => {
-    if (!text.trim()) return;
-    const userMsg = text.trim();
-    setMessages((m) => [...m, { role: "user", text: userMsg }]);
-    setInput("");
-    setTimeout(() => {
-      setMessages((m) => [...m, { role: "bot", text: getBotReply(userMsg) }]);
-    }, 500);
+  const sendMessage = async (text: string) => {
+    const userMessage = text.trim();
+
+    if (!userMessage || isLoading) return;
+
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: userMessage },
+    ]);
+
+    setMessage("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5001/api/ai-assistant",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: userMessage,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "AI Assistant unavailable");
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text:
+            data.reply ||
+            "Sorry, I could not generate a response right now.",
+        },
+      ]);
+    } catch (error) {
+      console.error("AI Assistant Error:", error);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text:
+            "Sorry, the AI Health Assistant is temporarily unavailable. Please try again.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSend = () => {
+    sendMessage(message);
+  };
+
+  const handleQuickReply = (text: string) => {
+    sendMessage(text);
   };
 
   return (
     <>
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg transition-transform hover:scale-105"
+      {!isOpen && (
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg"
+          aria-label="Open AI Health Assistant"
         >
-          <MessageCircle className="h-6 w-6 text-primary-foreground" />
-        </button>
+          <MessageCircle className="h-6 w-6" />
+        </Button>
       )}
-      {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[480px] w-[360px] flex-col rounded-xl border bg-card shadow-2xl">
-          <div className="flex items-center justify-between rounded-t-xl bg-primary px-4 py-3">
-            <span className="font-display font-semibold text-primary-foreground">SmartCare Assistant</span>
-            <button onClick={() => setOpen(false)}>
-              <X className="h-5 w-5 text-primary-foreground/80 hover:text-primary-foreground" />
-            </button>
+
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border bg-background shadow-2xl">
+          
+          {/* Header */}
+          <div className="flex items-center justify-between border-b px-4 py-3">
+            <div>
+              <h3 className="font-semibold">AI Health Assistant</h3>
+              <p className="text-xs text-muted-foreground">
+                SmartCare AI Assistant
+              </p>
+            </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                  {m.text}
+
+          {/* Messages */}
+          <div className="flex h-[400px] flex-col gap-3 overflow-y-auto p-4">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  msg.sender === "user"
+                    ? "justify-end"
+                    : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
+                    msg.sender === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}
+                >
+                  {msg.text}
                 </div>
               </div>
             ))}
+
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="rounded-2xl bg-muted px-4 py-2 text-sm">
+                  AI is thinking...
+                </div>
+              </div>
+            )}
           </div>
-          <div className="border-t p-3">
-            <div className="mb-2 flex flex-wrap gap-1.5">
-              {quickReplies.map((q) => (
-                <button
-                  key={q.label}
-                  onClick={() => send(q.label)}
-                  className="flex items-center gap-1 rounded-full border bg-secondary px-2.5 py-1 text-xs text-secondary-foreground transition-colors hover:bg-muted"
+
+          {/* Quick Replies */}
+          <div className="flex gap-2 overflow-x-auto border-t p-3">
+            {quickReplies.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Button
+                  key={item.label}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  disabled={isLoading}
+                  onClick={() => handleQuickReply(item.label)}
                 >
-                  <q.icon className="h-3 w-3" /> {q.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && send(input)}
-                placeholder="Type a message..."
-                className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
-              />
-              <Button size="icon" onClick={() => send(input)}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+                  <Icon className="mr-1 h-4 w-4" />
+                  {item.label}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Input */}
+          <div className="flex gap-2 border-t p-3">
+            <input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSend();
+                }
+              }}
+              placeholder="Ask a health question..."
+              disabled={isLoading}
+              className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+            />
+
+            <Button
+              onClick={handleSend}
+              disabled={!message.trim() || isLoading}
+              size="icon"
+              aria-label="Send message"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       )}
